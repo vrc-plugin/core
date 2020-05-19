@@ -1,0 +1,9 @@
+[package]
+name = "vrc-plugin-core"
+version = "0.1.0"
+authors = ["ぶーと / Yoshiaki Ueda <oh@bootjp.me>"]
+edition = "2018"
+
+[dependencies]
+logwatcher = "0.1"
+dirs = "2.0"
