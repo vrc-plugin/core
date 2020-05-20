@@ -2,19 +2,15 @@ extern crate glob;
 
 const VRC_LOG_LOCATION: &str = "\\AppData\\LocalLow\\VRChat\\VRChat\\";
 
-use self::glob::glob;
 use std::fs::{read_dir, ReadDir, metadata, DirEntry};
-use std::{fs, io};
 use std::path::PathBuf;
+use std::{fs, io};
 
 fn main() {
     let mut path = vrc_log_path().expect("user directory not detected");
     println!("log file {}", &path);
-    for x in vrc_latest_log(path) {
-        for y in x {
-            println!("{:?}", y)
-        }
-    }
+    let log = get_latest_log(vrc_log_list(path).expect(""));
+    println!("log file {:?}", log)
 }
 
 fn vrc_log_path() -> Option<String> {
@@ -27,16 +23,17 @@ fn vrc_log_path() -> Option<String> {
     None
 }
 
-fn vrc_latest_log(dir_path: String) -> Option<&PathBuf> {
-    let mut res : Vec<PathBuf> = Ok(fs::read_dir(dir_path)?
+fn vrc_log_list<'a>(dir_path: String) ->  Result<Vec<PathBuf>, io::Error>  {
+    Ok(fs::read_dir(dir_path)?
         .into_iter()
-        .filter(|r| r.is_ok()) // Get rid of Err variants for Result<DirEntry>
-        .map(|r| r.unwrap().path()) // This is safe, since we only have the Ok variants
-        .filter(|r| r.file_name().unwrap().to_str().unwrap().contains("output")) // Filter out non-folders
-        .collect()).expect("");
-    res.sort_by_key(|p : &PathBuf| p.metadata().unwrap().created().unwrap());
+        .filter(|r| r.is_ok())
+        .map(|r| r.unwrap().path())
+        .filter(|r:&PathBuf| r.file_name().unwrap().to_str().unwrap().contains("output"))
+        .collect())
+}
 
-    return res.get(0)
-
-
+fn get_latest_log<'a>(mut logs : Vec<PathBuf>) -> String {
+    logs.sort_by_key(|p| p.metadata().expect("").created().expect(""));
+    logs.reverse();
+    logs.get(0).expect("").to_str().unwrap().to_string()
 }
