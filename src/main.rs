@@ -27,11 +27,16 @@ fn vrc_log_path() -> Option<String> {
     None
 }
 
-fn vrc_latest_log(dir_path: String) -> Result<Vec<PathBuf>, io::Error> {
-    Ok(fs::read_dir(dir_path)?
+fn vrc_latest_log(dir_path: String) -> Option<&PathBuf> {
+    let mut res : Vec<PathBuf> = Ok(fs::read_dir(dir_path)?
         .into_iter()
         .filter(|r| r.is_ok()) // Get rid of Err variants for Result<DirEntry>
         .map(|r| r.unwrap().path()) // This is safe, since we only have the Ok variants
         .filter(|r| r.file_name().unwrap().to_str().unwrap().contains("output")) // Filter out non-folders
-        .collect())
+        .collect()).expect("");
+    res.sort_by_key(|p : &PathBuf| p.metadata().unwrap().created().unwrap());
+
+    return res.get(0)
+
+
 }
