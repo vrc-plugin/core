@@ -1,0 +1,54 @@
+syntax = "proto3";
+package event;
+
+import "google/protobuf/timestamp.proto";
+
+message Avatar  {
+    bool private = 1;
+
+}
+
+
+message User {
+    string id = 1;
+    string display_name = 2;
+    string user_name = 3;
+    bool private = 5;
+    Avatar avatar = 6;
+}
+
+message World {
+    string id = 1;
+    User owner = 2;
+    bool private = 5;
+}
+
+enum Permission {
+    PUBLIC = 0;
+    FRIENDS_PLUS = 1;
+    FRIENDS_ONLY = 2;
+    INVITE_PLUS = 3;
+    INVITE_ONLY = 4;
+}
+
+message Instance {
+    string id = 1;
+    User owner = 2;
+    World world = 3;
+    Permission permission = 4;
+    repeated User Users = 5;
+}
+
+message Event {
+
+    message PlayerJoin {    }
+    message PlayerLeft {    }
+    message EnterInstance {    }
+    message LeaveInstance {    }
+
+}
+
+
+
+
+
